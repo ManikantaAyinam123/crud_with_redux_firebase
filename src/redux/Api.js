@@ -18,7 +18,7 @@ export const getStudent = async () => {
 }
 export const newStudent= async (formData) => {
     try {
-        if (formData.name !== '' && formData.age !== '' && formData.gender !== '') {
+        if (formData.name !== '' && formData.email !== '' && formData.gender !== '' && formData !=='') {
             const response = await axios.post(`${databaseURL}/students.json`, formData);
            
             console.log( 'This is form data in add student',response.data);
@@ -36,3 +36,16 @@ export const deleteStudent = async (id) => {
         console.log('error occured')
       }
  }
+ export const updateStudent = async (id, formData) => {
+    try {
+      if (formData.name !== '' && formData.email !== '' && formData.gender !== '' && formData.role !== '') {
+        await axios.put(`${databaseURL}/students/${id}.json`, formData);
+        console.log('Student updated successfully');
+      } else {
+        alert('Please enter name, age, and gender');
+      }
+    } catch (error) {
+      console.error('Error updating student:', error);
+      alert('Error updating student:', error);
+    }
+  };

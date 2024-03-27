@@ -2,7 +2,6 @@ const initialSate = {
     data: [],
    
 }
-
 const Reducer = (state = initialSate, action) => {
     switch(action.type){
         case 'SET_DATA' :

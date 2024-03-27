@@ -8,12 +8,15 @@ import {Icon} from "@iconify/react";
 
 const Student = ({ data, setData }) => {
     const [showAddForm, setShowAddForm] = useState(false);
-    const [formData, setFormData] = useState({name: '',age: '',gender:'' });
-    console.log("this is data"+data);
+    const [showUpdate, setShowUpdate] = useState(false);
+  
+    const [formData, setFormData] = useState({name: '',email: '',gender:'',role:''});
+    console.log("this is data",data);
 
 //cancel icon at top right
     const handleCancelUpdate = () => {
         // setShowUpdate(false);
+        setShowUpdate(false);
         setShowAddForm(false);
         setFormData({ name: "" });
       };
@@ -37,15 +40,16 @@ const Student = ({ data, setData }) => {
         e.preventDefault();
     
         try {
-          if (formData.name !== ''&& formData.age !==''&& formData.gender !=='') {
+          if (formData.name !== ''&& formData.email !==''&& formData.gender !==''&& formData !=='') {
             await newStudent(formData);
             console.log("this is form data",formData)
             allStudentsData();
             setShowAddForm(!showAddForm);
             setFormData({
               name: '',
-              age: '',
+              email: '',
               gender:'',
+              role:'',
             });
            
           } else {
@@ -55,6 +59,8 @@ const Student = ({ data, setData }) => {
           console.error('Error adding student:', error);
         }
       }
+
+      // delete funtion
       const handleDelete = async (id) => {
         try{
           await deleteStudent(id)
@@ -64,6 +70,30 @@ const Student = ({ data, setData }) => {
           console.log("Student Successfully Deleted")
         }
       }
+       
+      // to edit form feilds
+      const handleEdit = (studentId, studentName,studentEmail,studentGender,studentRole) => {
+        setShowUpdate(true);
+        setFormData({ id: studentId, name: studentName, email:studentEmail, gender:studentGender,role:studentRole });
+      };
+
+      //update student details
+      const handleUpdate = async (e) => {
+        e.preventDefault();
+        try {
+          if (formData.name === '' || formData.email === '' || formData.gender === '' || formData.role ==='') {
+            alert("Please fill in all the fields");
+          } else {
+            await updateStudent(formData.id, formData);
+            allStudentsData();
+            setShowUpdate(false); 
+            setFormData({ name: '', email: '', gender: '', role:''}); 
+          }
+        } catch (error) {
+          console.error('Error updating student:', error);
+        }
+      }
+      
   return (
     <div>
         <div className="container  justify-content-center mt-5 ">
@@ -83,6 +113,7 @@ const Student = ({ data, setData }) => {
           {showAddForm && (
             <div className="overlay">
               <div className="form-container">
+                {/*This is new data form */}
                 <form onSubmit={handleSubmit}>
                 <button
                     type="button"
@@ -103,21 +134,21 @@ const Student = ({ data, setData }) => {
                       onChange={(e) => handleInputChange(e, 'name')}
                     />
                 
-                  <label htmlFor="age" className="form-label">
-                      Age
+                  <label htmlFor="email" className="form-label">
+                      Email
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      id="age"
-                      age="age"
-                      value={formData.age}
-                      onChange={(e) => handleInputChange(e, 'age')}
+                      id="email"
+                      age="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange(e, 'email')}
                     />
                   </div>
                   <label htmlFor="gender" className="form-label">
-                                                Gender
-                                            </label>
+                      Gender
+                    </label>
                                             <select
                                                 className="form-control"
                                                 id="gender"
@@ -125,11 +156,24 @@ const Student = ({ data, setData }) => {
                                                 value={formData.gender}
                                                 onChange={(e) => handleInputChange(e, 'gender')}
                                             >
-                                                <option value="">Select Gender</option>
+                                                <option >Select Gender</option>
                                                 <option value="male">Male</option>
                                                 <option value="female">Female</option>
                                                 <option value="other">Other</option>
                                             </select>
+                  <div className="mb-3">
+                    <label htmlFor="role" className="form-label">
+                      Role
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="role"
+                      role="role"
+                      value={formData.role}
+                      onChange={(e) => handleInputChange(e, 'role')}
+                    />
+                  </div>                         
                   <button type="submit" className="btn btn-primary mt-2">
                     Submit
                   </button>
@@ -137,12 +181,87 @@ const Student = ({ data, setData }) => {
               </div>
             </div>
           )}
-          <table className="table table-striped shadow mt-2">
+
+        
+          {/*This is update form*/}
+          {showUpdate && (
+            <div className="overlay">
+              <div className="form-container">
+                <button
+                  type="button"
+                  className="btn btn-icon btn-cancel position-absolute top-0 end-0 m-1">
+                <Icon onClick={handleCancelUpdate} icon="iconoir:cancel" />
+                </button>
+                <form  onSubmit={handleUpdate}>
+                  <div className="mb-3">
+                    <label htmlFor="name" className="form-label">Name</label>
+                    <input type="text"
+                      className="form-control"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange(e, 'name')}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="name" className="form-label">
+                      Email
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="email"
+                      age="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange(e, 'email')}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="name" className="form-label">
+                      Gender
+                    </label>
+                                      <select
+                                              className="form-control"
+                                              id="gender"
+                                              name="gender"
+                                              value={formData.gender}
+                                              onChange={(e) => handleInputChange(e, 'gender')}
+                                          >
+                                          <option value="">Select Gender</option>
+                                          <option value="male">Male</option>
+                                          <option value="female">Female</option>
+                                          <option value="other">Other</option>
+                                      </select>
+                   
+                  </div>
+                 <div className="mb-3">
+                    <label htmlFor="role" className="form-label">
+                      Role
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="role"
+                      role="role"
+                      value={formData.role}
+                      onChange={(e) => handleInputChange(e, 'role')}
+                    />
+                  </div> 
+                  <button type="submit" className="btn btn-primary">
+                    Update
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+          {/* This is for printing data in map*/}
+          <table className="table table-striped shadow mt-2 border">
             <thead>
               <tr>
                 <th scope="col">Name</th>
-                <th scope="col">Age</th>
+                <th scope="col">Email</th>
                 <th scope="col">Gender</th>
+                <th scope="col">Role</th>
                 <th scope="col">Update</th>
                 <th scope="col">Delete</th>
               </tr>
@@ -151,13 +270,14 @@ const Student = ({ data, setData }) => {
               {data.map((student) => (
                 <tr key={student.id}>
                   <td>{student.name}</td>
-                  <td>{student.age}</td>
+                  <td>{student.email}</td>
                   <td>{student.gender}</td>
+                  <td>{student.role}</td>
                   <td>
                     <button
                       type="button"
                       className="btn btn-primary"
-                     
+                      onClick={() => handleEdit(student.id, student.name, student.email, student.gender, student.role)}
                     >
                       Update
                     </button>
